@@ -80,6 +80,7 @@ function App() {
     const { isSupported, requestPipWindow, pipWindow } = usePiPWindow();
 
     const startPiP = useCallback(() => {
+      console.log('qqq requestPipWindow')
       requestPipWindow(500, 500);
     }, [requestPipWindow]);
 
@@ -102,9 +103,9 @@ function App() {
       <main>
         <h1>Zoom Meeting SDK Sample React</h1>
         <button onClick={getSignature}>Join Meeting</button>
-        {/* <PictureInPictureProvider>
+        <PictureInPictureProvider>
           <ZoomSDK />
-        </PictureInPictureProvider> */}
+        </PictureInPictureProvider>
       </main>
     </div>
   );

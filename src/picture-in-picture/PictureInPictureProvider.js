@@ -7,7 +7,7 @@ import {
 } from "react";
 
 const PictureInPictureContext = createContext(undefined)
-
+console.log('qqq context', PictureInPictureContext)
 export function PictureInPictureProvider({ children }) {
     // Detect if the feature is available.
     const isSupported = "documentPictureInPicture" in window;
@@ -60,12 +60,10 @@ export function PictureInPictureProvider({ children }) {
 
             // Adding Zoom peer dependencies and css files to the PIP window
             document.querySelectorAll('script').forEach((script) => {
-                pip.document.body.appendChild(script);
+                pip.document.head.appendChild(script);
             })
 
             const ZoomVideo = document.getElementById('zmmtg-root');
-            console.log('qqq ZoomVideo', ZoomVideo)
-            // document.getElementById('zmmtg-root').style.display = 'block'
             pip.document.body.append(ZoomVideo);
 
             setPipWindow(pip);
