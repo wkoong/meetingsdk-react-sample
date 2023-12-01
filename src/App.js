@@ -1,8 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { createRoot } from 'react-dom/client';
+import React, { useCallback } from 'react';
 
 import './App.css';
 import { ZoomMtg } from '@zoomus/websdk';
+import { PictureInPictureProvider, usePiPWindow } from './picture-in-picture/PictureInPictureProvider';
+import PiPWindow from './picture-in-picture/PictureInPictureWindow';
 
 
 ZoomMtg.setZoomJSLib('https://source.zoom.us/2.18.0/lib', '/av');
@@ -14,14 +15,6 @@ ZoomMtg.i18n.load('en-US');
 ZoomMtg.i18n.reload('en-US');
 
 function App() {
-  const divRef = useRef < HTMLDivElement > (null);
-
-  useEffect(() => {
-    if (divRef.current) {
-      console.log('useEffect has been called')
-    }
-  }, [])
-
   var authEndpoint = 'http://localhost:4000/'
   var sdkKey = 'Gs0bjFNlSum6XCXwgv4sHA'
   var meetingNumber = '7878969529'
@@ -46,7 +39,6 @@ function App() {
     }).then(res => res.json())
       .then(response => {
         startMeeting(response.signature);
-        // openPictureInPicture();
       }).catch(error => {
         console.error(error)
       })
@@ -55,7 +47,6 @@ function App() {
   async function startMeeting(signature) {
     document.getElementById('zmmtg-root').style.display = 'block'
 
-    console.log('qqq meeting number', meetingNumber)
     ZoomMtg.init({
       leaveUrl: leaveUrl,
       success: (success) => {
@@ -74,7 +65,7 @@ function App() {
             console.log(success)
           },
           error: (error) => {
-            console.log(error)
+            console.log('error here: ', error)
           }
         })
 
@@ -85,36 +76,35 @@ function App() {
     })
   }
 
-  async function openPictureInPicture() {
-    const pipWindow = await window.documentPictureInPicture.requestWindow();
-    document.querySelectorAll('script').forEach((script) => {
-      pipWindow.document.body.appendChild(script);
-    })
+  function ZoomSDK() {
+    const { isSupported, requestPipWindow, pipWindow } = usePiPWindow();
 
-    document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
-      pipWindow.document.head.appendChild(link);
-    })
+    const startPiP = useCallback(() => {
+      requestPipWindow(500, 500);
+    }, [requestPipWindow]);
 
-    // add peer dependencies, css here?
-    const zoomMeeting = document.getElementById('zmmtg-root')
+    return (
+      <div>
 
-    console.log('qqq zooomMeeting', zoomMeeting, typeof zoomMeeting)
-    // const pipDiv = pipWindow.document.createElement("div");
-    // pipDiv.setAttribute("id", "pip-root");
-    pipWindow.document.body.append(zoomMeeting);
+        <button id="open-pip" onClick={startPiP} style={{ zIndex: 100000 }}>Open picture-in-picture</button>
+        {pipWindow && (
+          <PiPWindow pipWindow={pipWindow}>
+            <div>Hello World</div>
+          </PiPWindow>
+        )}
 
-
-    // const PIP_ROOT = createRoot(pipWindow.document.getElementById('zmmtg-root'));
-    // PIP_ROOT.render(zoomMeeting);
+      </div>
+    )
   }
 
   return (
     <div className="App">
       <main>
         <h1>Zoom Meeting SDK Sample React</h1>
-
         <button onClick={getSignature}>Join Meeting</button>
-        <button id="open-pip" onClick={openPictureInPicture} style={{ zIndex: 100000 }}>Open picture-in-picture</button>
+        {/* <PictureInPictureProvider>
+          <ZoomSDK />
+        </PictureInPictureProvider> */}
       </main>
     </div>
   );
