@@ -1,5 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import { createRoot } from 'react-dom/client';
+import React from 'react';
+import { createPortal } from 'react-dom';
 
 import './App.css';
 import { ZoomMtg } from '@zoomus/websdk';
@@ -14,20 +14,12 @@ ZoomMtg.i18n.load('en-US');
 ZoomMtg.i18n.reload('en-US');
 
 function App() {
-  const divRef = useRef < HTMLDivElement > (null);
-
-  useEffect(() => {
-    if (divRef.current) {
-      console.log('useEffect has been called')
-    }
-  }, [])
-
   var authEndpoint = 'http://localhost:4000/'
   var sdkKey = 'Gs0bjFNlSum6XCXwgv4sHA'
   var meetingNumber = '7878969529'
   var passWord = 'aFYxQW9aVTZkbWxpdXlKalc4aHNDUT09'
   var role = 1
-  var userName = 'React'
+  var userName = 'Kenji'
   var userEmail = ''
   var registrantToken = ''
   var zakToken = ''
@@ -41,12 +33,12 @@ function App() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         meetingNumber: meetingNumber,
-        role: role
+        role: role,
+        userName: userName,
       })
     }).then(res => res.json())
       .then(response => {
         startMeeting(response.signature);
-        // openPictureInPicture();
       }).catch(error => {
         console.error(error)
       })
@@ -94,18 +86,10 @@ function App() {
     document.querySelectorAll('link[rel="stylesheet"]').forEach((link) => {
       pipWindow.document.head.appendChild(link);
     })
-
-    // add peer dependencies, css here?
     const zoomMeeting = document.getElementById('zmmtg-root')
+    // createPortal(zoomMeeting, pipWindow.document.body);
 
-    console.log('qqq zooomMeeting', zoomMeeting, typeof zoomMeeting)
-    // const pipDiv = pipWindow.document.createElement("div");
-    // pipDiv.setAttribute("id", "pip-root");
-    pipWindow.document.body.append(zoomMeeting);
-
-
-    // const PIP_ROOT = createRoot(pipWindow.document.getElementById('zmmtg-root'));
-    // PIP_ROOT.render(zoomMeeting);
+    pipWindow.document.body.appendChild(zoomMeeting);
   }
 
   return (
